@@ -15,13 +15,13 @@ server.listen(PORT, () => {
 	console.log('Server is running on http://localhost:6677');
 });
 
-app.use(express.static(__dirname + '/client'));
+app.use(express.static('/client'));
 
 app.get('/hello', (req, res) => {
 	res.status(200).send('Hola mundo desde una ruta');
 });
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/client/index.html');
+    res.sendFile('/client/index.html');
 });
 
 // ahora, vamos a crear un evento para el socket
