@@ -1,4 +1,5 @@
-var socket = io.connect('http://192.168.10.7:6677', { 'forceNew': true });
+
+var socket = io.connect('https://chat-accesible-c3f6ce045512.herokuapp.com', { 'forceNew': true });
 // los elementos
 var messages = document.getElementById('messages');
 var form = document.getElementById('form');
