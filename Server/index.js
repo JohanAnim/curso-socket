@@ -2,7 +2,7 @@
 
 const express = require('express');
 const app = express();
-const server = require('http').Server(app);
+const server = require('https').Server(app);
 const io = require('socket.io')(server);
 
 let messages = [{
@@ -19,10 +19,6 @@ app.use(express.static('client'));
 
 app.get('/hello', (req, res) => {
 	res.status(200).send('Hola mundo desde una ruta');
-});
-app.get('/', (req, res) => {
-	// mostrar el archivo index.html
-	res.status(200).sendFile(__dirname + '/index.html');
 });
 
 // ahora, vamos a crear un evento para el socket
