@@ -11,7 +11,13 @@ const server = app.listen(app.get('port'), ()=>{
 
 app.use(express.static('Client'));
 
-const io = socketIO(server);
+// Configuración de Socket.IO para CORS
+const io = socketIO(server, {
+	cors: {
+	  origin: "*", // Permitir todos los orígenes. Ajusta esto según tus necesidades.
+	  methods: ["GET", "POST"]
+	}
+  });
 
 let messages = [{
 	id: 1,
@@ -32,3 +38,8 @@ io.on('connection', (socket) => {
 	});
 
 });
+
+// Manejo de rutas inexistentes
+app.use((req, res, next) => {
+	res.status(404).send('404 Not Found');
+  });
