@@ -1,7 +1,11 @@
 
-var socket = io.connect('https://chat-accesible-c3f6ce045512.herokuapp.com/', { 'forceNew': true });
+var SOCKET_SERVER_URL = 'http://192.168.10.7:80';
+if (window.location.hostname !== '192.168.10.7') {
+	SOCKET_SERVER_URL = 'https://chat-accesible-c3f6ce045512.herokuapp.com/';
+}
+var socket = io.connect(SOCKET_SERVER_URL, { 'forceNew': true });
 
-// los elementos
+// Los elementos
 var messages = document.getElementById('messages');
 var form = document.getElementById('form');
 var nickname = document.getElementById('nickname');
@@ -12,12 +16,12 @@ var form_login = document.getElementById('form_login');
 var form_logout = document.getElementById('form_logout');
 var nickname_span = document.getElementById('nickname_span');
 var select_voz = document.getElementById('select_voz');
-// audio para cuando manden un mensaje
+// Audio para cuando manden un mensaje
 var audio_recibido = new Audio('./media/$whatsapp_incoming.wav');
-// audio para cuadno se reciba un mensaje
+// Audio para cuando se reciba un mensaje
 var audio_enviado = new Audio('./media/wa_ptt_sent.wav');
 
-// después que se cargue la página meter todas las voces disponibles en el select
+// Después de que se cargue la página, meter todas las voces disponibles en el select
 window.speechSynthesis.onvoiceschanged = function () {
 	var voices = speechSynthesis.getVoices();
 	voices.forEach(function (voice) {
@@ -31,26 +35,24 @@ window.speechSynthesis.onvoiceschanged = function () {
 function Tts(texto) {
 	var utterance = new SpeechSynthesisUtterance();
 	utterance.text = texto;
-	// comprovar si no se a iniciado seción
+	// Comprobar si no se ha iniciado sesión
 	if (!localStorage.getItem('nickname')) {
-		// colocarle la voz del select
-		utterance.voice = speechSynthesis.getVoices().filter(function (voice) {
+		// Colocarle la voz del select
+		utterance.voice = speechSynthesis.getVoices().find(function (voice) {
 			return voice.name === select_voz.value;
-		})[0];
+		});
 	} else {
 		var voices = speechSynthesis.getVoices();
-		voices.forEach(function (voice) {
-			if (voice.name === localStorage.getItem('voz')) {
-				utterance.voice = voice;
-			}
+		utterance.voice = voices.find(function (voice) {
+			return voice.name === localStorage.getItem('voz');
 		});
 	}
-	// reproducir el mensaje
+	// Reproducir el mensaje
 	speechSynthesis.cancel();
 	speechSynthesis.speak(utterance);
 }
 
-// al iniciar la página, comprobar si el usuario ya inició secióonseción o no, y en función de eso mostrar y ocultar las secciones correspondientes
+// Al iniciar la página, comprobar si el usuario ya inició sesión o no, y en función de eso mostrar y ocultar las secciones correspondientes
 window.onload = function () {
 	if (localStorage.getItem('nickname')) {
 		login.style.display = 'none';
@@ -65,12 +67,12 @@ window.onload = function () {
 	}
 };
 
-// colocarle al select un evento de cambio para que hable la voz seleccionada
+// Colocarle al select un evento de cambio para que hable la voz seleccionada
 select_voz.addEventListener('change', function () {
 	Tts('La voz seleccionada es ' + select_voz.value);
 });
 
-// evento para iniciar sesión
+// Evento para iniciar sesión
 form_login.addEventListener('submit', function (e) {
 	e.preventDefault();
 	localStorage.setItem('nickname', nickname.value);
@@ -78,42 +80,99 @@ form_login.addEventListener('submit', function (e) {
 	location.reload();
 });
 
-// evento para cerrar sesión
+// Evento para cerrar sesión
 form_logout.addEventListener('submit', function (e) {
 	e.preventDefault();
 	localStorage.removeItem('nickname');
 	location.reload();
 });
 
-// embiar el mensaje al servidor
+// Enviar el mensaje al servidor
 socket.on('messages', function (data) {
 	console.log(data);
 	render(data);
+
 });
 
 // Reproducir el sonido de mensaje recibido solo cuando se recibe el evento 'message-received'
 socket.on('message-received', function (data) {
 	audio_recibido.play();
-	// leer el mensaje recibido
+	// Leer el mensaje recibido
 	Tts("Nuevo mensaje de " + data.nickname + " dice: " + data.text);
 	navigator.vibrate([300, 100, 300]);
 });
 
 function render(data) {
 	var html = data.map(function (elem, index) {
-		return (`<li tabindex="0" class="mensaje">
-			<strong>${elem.nickname}</strong>:
-			<em>${elem.text}</em>
-		</li>`);
+		return (`<li tabindex="-1" class="mensaje" aria-selected="false" onkeydown="handleKeyDown(event)" role="option">
+      <strong>${elem.nickname}</strong>:
+      <em>${elem.text}</em>
+    </li>`);
 	}).join(' ');
 
 	messages.innerHTML = html;
 	messages.scrollTop = messages.scrollHeight;
+
+		// obtener el indice del mensaje enfocado del localStorage
+		let currentIndex = localStorage.getItem('currentIndex');
+		// si el indice existe, enfocar el mensaje correspondiente
+		if (currentIndex) {
+			document.querySelectorAll('.mensaje')[currentIndex].focus();
+			document.querySelectorAll('.mensaje')[currentIndex].tabIndex = 0;
+			document.querySelectorAll('.mensaje')[currentIndex].ariaSelected = 'true';
+		} else {
+			// si no, enfocar el último mensaje
+			document.querySelectorAll('.mensaje')[document.querySelectorAll('.mensaje').length - 1].focus();
+			document.querySelectorAll('.mensaje')[document.querySelectorAll('.mensaje').length - 1].tabIndex = 0;
+			document.querySelectorAll('.mensaje')[document.querySelectorAll('.mensaje').length - 1].ariaSelected = 'true';
+		}
+}
+
+// evento para guardar el indice de la posición del mensaje enfocado en el localStorage
+document.addEventListener('focus', function (event) {
+	let currentMessage = event.target;
+	let allMessages = document.querySelectorAll('.mensaje');
+	let currentIndex = Array.from(allMessages).indexOf(currentMessage);
+	localStorage.setItem('currentIndex', currentIndex);
+}, true);
+
+function handleKeyDown(event) {
+	var currentMessage = document.activeElement;
+	var allMessages = document.querySelectorAll('.mensaje');
+	var currentIndex = Array.from(allMessages).indexOf(currentMessage);
+
+	switch (event.key) {
+		case 'ArrowUp':
+			event.preventDefault();
+			if (currentIndex > 0) {
+				allMessages[currentIndex].ariaSelected = 'false';
+				allMessages[currentIndex].tabIndex = -1;
+				allMessages[currentIndex - 1].ariaSelected = 'true';
+				allMessages[currentIndex - 1].tabIndex = 0;
+				allMessages[currentIndex - 1].focus();
+			}
+			break;
+		case 'ArrowDown':
+			event.preventDefault();
+			if (currentIndex < allMessages.length - 1) {
+				allMessages[currentIndex].ariaSelected = 'false';
+				allMessages[currentIndex].tabIndex = -1;
+				allMessages[currentIndex + 1].ariaSelected = 'true';
+				allMessages[currentIndex + 1].tabIndex = 0;
+				allMessages[currentIndex + 1].focus();
+			}
+			break;
+		default:
+			break;
+	}
 }
 
 function addMessage(e) {
-	// evita que el formulario se envíe
 	e.preventDefault();
+	if (text.value.trim() === '') {
+		Tts('No puedes enviar un mensaje vacío');
+		return;
+	}
 	var message = {
 		nickname: nickname.value,
 		text: text.value
@@ -124,45 +183,14 @@ function addMessage(e) {
 	audio_enviado.play();
 	return false;
 }
-// aplicar el evento al formulario
 form.addEventListener('submit', addMessage);
 
-function mejorarAccesibilidadLista() {
-	var elementosLista = Array.from(messages.children);
-	elementosLista.forEach(function (elemento) {
-		elemento.addEventListener('focus', function () {
-			elemento.classList.add('focus');
-		});
-		elemento.addEventListener('blur', function () {
-			elemento.classList.remove('focus');
-		});
-	});
-}
-
-// evento de teclado para navegar con las teclas flecha arriba y abajo
-messages.addEventListener('keydown', function (e) {
-	var elementosLista = Array.from(messages.children);
-	var elementoActivo = document.activeElement;
-	var indiceElementoActivo = elementosLista.indexOf(elementoActivo);
-	if (e.key === 'ArrowDown') {
-		if (indiceElementoActivo < elementosLista.length - 1) {
-			elementosLista[indiceElementoActivo + 1].focus();
-		}
-	} else if (e.key === 'ArrowUp') {
-		if (indiceElementoActivo > 0) {
-			elementosLista[indiceElementoActivo - 1].focus();
-		}
-
+text.addEventListener('keydown', function (e) {
+	if (e.key === 'Enter' && !e.ctrlKey) {
+		e.preventDefault();
+		addMessage(e);
 	}
-			// la tecla inicio
-	else if (e.key === 'Home') {
-		elementosLista[0].focus();
-	}
-	// la tecla fin
-	else if (e.key === 'End') {
-		elementosLista[elementosLista.length - 1].focus();
+	if (e.key === 'Enter' && e.ctrlKey) {
+		text.value += '\n';
 	}
 });
-
-// ejecutar la funcion para mejorar la accesibilidad de la lista
-mejorarAccesibilidadLista();

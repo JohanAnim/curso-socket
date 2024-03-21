@@ -59,21 +59,31 @@
 			list-style: none;
 			padding: 0;
 		}
+
 		.lista_mensajes li{
 			padding: 10px;
 			border-bottom: 1px solid #000;
 		}
 		.caja_formulario{
 			margin-top: 20px;
+			/* establecer el ancho: 100%; */
+			width: 100%;
+			/* posición apsoluta en la parte inferior */
+			position: absolute;
+			bottom: 0;
 		}
 
-		.caja_formulario input[type="text"], .caja_formulario textarea{
-			width: 100%;
+		/* poner todos los elementos del formulario en una sola barra orizontal */
+		.caja_formulario form{
+			display: flex;
+			flex-direction: column;
+		}
+		.caja_formulario textarea, .caja_formulario input[type="submit"]{
+			padding: 10px;
 			margin-bottom: 10px;
 		}
+
 		.caja_formulario input[type="submit"]{
-			width: 100%;
-			padding: 10px;
 			background-color: #000;
 			color: #fff;
 			border: none;
