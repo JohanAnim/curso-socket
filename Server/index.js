@@ -10,7 +10,7 @@ let messages = [{
 	text: 'Bienvenido al chat privado de Socket.io y NodeJS de JohanG',
 	nickname: 'Bot - JohanBot'
 }];
-const PORT = process.env.PORT || 8080;
+const PORT = 8080
 server.listen(PORT, () => {
 	console.log('Server is running on http://localhost:6677');
 });
