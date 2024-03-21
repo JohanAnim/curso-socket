@@ -108,9 +108,7 @@ function render(data) {
 	}).join(' ');
 
 	messages.innerHTML = html;
-	messages.scrollTop = messages.scrollHeight;
-	// no hacer nada con el foco
-	document.activeElement.blur();
+	// messages.scrollTop = messages.scrollHeight;
 }
 
 function addMessage(e) {
