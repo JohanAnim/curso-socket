@@ -1,24 +1,24 @@
 //  Code: Server
 
+
+// Importar módulos
 const express = require('express');
 const app = express();
-const socketIO = require('socket.io');
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
-app.use('port', process.env.PORT || 8080) 
-const server = app.listen(app.get('port'), ()=>{
-   console.log(`Servidor corriendo en el puerto ${app.get('port')}`)
-})
+// Configurar el puerto
+const port = process.env.PORT || 80;
 
-// app.use(express.static('Client'));
+// Configurar el directorio de archivos estáticos
+app.use(express.static('Client'));
 
-// Configuración de Socket.IO para CORS
-const io = socketIO(server, {
-	cors: {
-	  origin: "*", // Permitir todos los orígenes. Ajusta esto según tus necesidades.
-	  methods: ["GET", "POST"]
-	}
-  });
+// Iniciar el servidor
+server.listen(port, () => {
+	console.log('Servidor corriendo en http://localhost:' + port);
+});
 
+// Crear un array para almacenar los mensajes
 let messages = [{
 	id: 1,
 	text: 'Bienvenido al chat privado de Socket.io y NodeJS de JohanG',
