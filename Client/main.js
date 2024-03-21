@@ -97,6 +97,8 @@ socket.on('message-received', function (data) {
 	// leer el mensaje recibido
 	Tts("Nuevo mensaje de " + data.nickname + " dice: " + data.text);
 	navigator.vibrate([300, 100, 300]);
+	// enfocar el último elemento de la lista
+	messages.lastChild.focus();
 });
 
 function render(data) {
