@@ -9,7 +9,7 @@ const server = app.listen(app.get('port'), ()=>{
    console.log(`Servidor corriendo en el puerto ${app.get('port')}`)
 })
 
-app.use(express.static('Client'));
+// app.use(express.static('Client'));
 
 // Configuración de Socket.IO para CORS
 const io = socketIO(server, {
