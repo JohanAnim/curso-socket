@@ -109,9 +109,8 @@ function render(data) {
 
 	messages.innerHTML = html;
 	messages.scrollTop = messages.scrollHeight;
-	// evitar que el foco se pierda y enfocar al último elemento que avía sido enfocado
-	var elementosLista = Array.from(messages.children);
-	elementosLista[elementosLista.length - 1].focus();
+	// no hacer nada con el foco
+	document.activeElement.blur();
 }
 
 function addMessage(e) {
