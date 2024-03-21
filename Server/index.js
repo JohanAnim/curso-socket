@@ -1,12 +1,17 @@
 //  Code: Server
 
-const express = require('express'), app = expres()
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const express = require('express');
+const app = express();
+const socketIO = require('socket.io');
 
-app.get('/', (req, res) => {
-	res.sendFile(__dirname + '/Client/index.html');
-});
+app.use('port', process.env.PORT || 8080) 
+const server = app.listen(app.get('port'), ()=>{
+   console.log(`Servidor corriendo en el puerto ${app.get('port')}`)
+})
+
+app.use(express.static('Client'));
+
+const io = socketIO(server);
 
 let messages = [{
 	id: 1,
@@ -26,8 +31,4 @@ io.on('connection', (socket) => {
 		socket.broadcast.emit('message-received', data);
 	});
 
-});
-
-http.listen(3000, () => {
-	console.log('Servidor corriendo en http://localhost:3000');
 });
