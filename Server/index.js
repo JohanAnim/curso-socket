@@ -1,28 +1,18 @@
 //  Code: Server
 
-const express = require('express');
-const app = express();
-const server = require('http').Server(app);
-const io = require('socket.io')(server);
+const express = require('express'), app = expres()
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+
+app.get('/', (req, res) => {
+	res.sendFile(__dirname + '/Client/index.html');
+});
 
 let messages = [{
 	id: 1,
 	text: 'Bienvenido al chat privado de Socket.io y NodeJS de JohanG',
 	nickname: 'Bot - JohanBot'
 }];
-// configurar para producción
-const port = process.env.PORT || 6677;
-
-server.listen(port, () => {
-	console.log('Servidor corriendo en http://localhost:' + port);
-});
-
-// Middleware para cargar la carpeta de archivos estáticos
-app.use(express.static('client'));
-
-app.get('/', (req, res) => {
-	res.status(200).send('Hola, bienvenido al chat privado de Socket.io y NodeJS de JohanG');
-});
 
 // ahora, vamos a crear un evento para el socket
 io.on('connection', (socket) => {
@@ -36,4 +26,8 @@ io.on('connection', (socket) => {
 		socket.broadcast.emit('message-received', data);
 	});
 
+});
+
+http.listen(3000, () => {
+	console.log('Servidor corriendo en http://localhost:3000');
 });
