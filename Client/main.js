@@ -1,5 +1,6 @@
 
-// inicializar el socket para produccion
+// inicializar el socket para que funcione muy bien con el servidor en Heroku
+var socket = io.connect('https://chat-accesible-c3f6ce045512.herokuapp.com/', { 'forceNew': true });
 
 // los elementos
 var messages = document.getElementById('messages');
