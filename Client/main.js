@@ -38,15 +38,15 @@ function Tts(texto) {
 			return voice.name === select_voz.value;
 		})[0];
 	} else {
-	var voices = speechSynthesis.getVoices();
-	voices.forEach(function (voice) {
-		if (voice.name === localStorage.getItem('voz')) {
-			utterance.voice = voice;
-		}
-	});
+		var voices = speechSynthesis.getVoices();
+		voices.forEach(function (voice) {
+			if (voice.name === localStorage.getItem('voz')) {
+				utterance.voice = voice;
+			}
+		});
 	}
 	// reproducir el mensaje
-		speechSynthesis.cancel();
+	speechSynthesis.cancel();
 	speechSynthesis.speak(utterance);
 }
 
@@ -97,8 +97,13 @@ socket.on('message-received', function (data) {
 	// leer el mensaje recibido
 	Tts("Nuevo mensaje de " + data.nickname + " dice: " + data.text);
 	navigator.vibrate([300, 100, 300]);
-	// enfocar el último elemento de la lista
-	messages.lastChild.focus();
+	// hacer para que no pierda el foco al recibir un mensaje
+	var elementoActivo = document.activeElement;
+	var indiceElementoActivo = Array.from(messages.children).indexOf(elementoActivo);
+	if (indiceElementoActivo === -1) {
+		messages.lastChild.focus();
+	}
+
 });
 
 function render(data) {
