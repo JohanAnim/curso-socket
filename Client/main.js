@@ -108,7 +108,7 @@ function render(data) {
 	}).join(' ');
 
 	messages.innerHTML = html;
-	// messages.scrollTop = messages.scrollHeight;
+	messages.scrollTop = messages.scrollHeight;
 }
 
 function addMessage(e) {
@@ -152,6 +152,15 @@ messages.addEventListener('keydown', function (e) {
 		if (indiceElementoActivo > 0) {
 			elementosLista[indiceElementoActivo - 1].focus();
 		}
+
+	}
+			// la tecla inicio
+	else if (e.key === 'Home') {
+		elementosLista[0].focus();
+	}
+	// la tecla fin
+	else if (e.key === 'End') {
+		elementosLista[elementosLista.length - 1].focus();
 	}
 });
 
