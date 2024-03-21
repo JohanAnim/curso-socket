@@ -10,18 +10,16 @@ let messages = [{
 	text: 'Bienvenido al chat privado de Socket.io y NodeJS de JohanG',
 	nickname: 'Bot - JohanBot'
 }];
-const PORT = process.env.PORT || 6677;
+const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
 	console.log('Server is running on http://localhost:6677');
 });
 
-app.use(express.static('/client'));
+// Middleware para cargar la carpeta de archivos estáticos
+app.use(express.static('client'));
 
-app.get('/hello', (req, res) => {
-	res.status(200).send('Hola mundo desde una ruta');
-});
 app.get('/', (req, res) => {
-    res.sendFile('/client/index.html');
+	res.status(200).send('Hola, bienvenido al chat privado de Socket.io y NodeJS de JohanG');
 });
 
 // ahora, vamos a crear un evento para el socket
