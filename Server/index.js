@@ -10,10 +10,7 @@ let messages = [{
 	text: 'Bienvenido al chat privado de Socket.io y NodeJS de JohanG',
 	nickname: 'Bot - JohanBot'
 }];
-const PORT = 8080
-server.listen(PORT, () => {
-	console.log('Server is running on http://localhost:6677');
-});
+// escuchar en la raíz del servidor sin puerto
 
 // Middleware para cargar la carpeta de archivos estáticos
 app.use(express.static('client'));
