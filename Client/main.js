@@ -97,12 +97,8 @@ socket.on('message-received', function (data) {
 	// leer el mensaje recibido
 	Tts("Nuevo mensaje de " + data.nickname + " dice: " + data.text);
 	navigator.vibrate([300, 100, 300]);
-	// hacer para que no pierda el foco al recibir un mensaje
-	var elementoActivo = document.activeElement;
-	var indiceElementoActivo = Array.from(messages.children).indexOf(elementoActivo);
-	if (indiceElementoActivo === -1) {
-		messages.lastChild.focus();
-	}
+	// mantener el foco en el elemento enfocado actualmente
+	document.activeElement.focus();
 
 });
 
