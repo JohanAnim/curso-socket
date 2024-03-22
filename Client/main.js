@@ -68,6 +68,10 @@ window.onload = function () {
 		form.style.display = 'block';
 		nickname.value = localStorage.getItem('nickname');
 		nickname_span.innerHTML = localStorage.getItem('nickname');
+		setTimeout(() => {
+			audio_fondo.play();
+			audio_fondo.loop = true;
+		}, 500);
 	} else {
 		login.style.display = 'block';
 		logout.style.display = 'none';
@@ -94,9 +98,6 @@ form_login.addEventListener('submit', function (e) {
 	// Emitir el evento 'add-user' al servidor solo si el nombre de usuario es válido
 	socket.emit('add-user', username);
 	location.reload();
-	// el sonido fondo
-	audio_fondo.play();
-	audio_fondo.loop = true;
 });
 
 // Evento para cerrar sesión
