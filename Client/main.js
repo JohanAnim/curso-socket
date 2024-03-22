@@ -22,6 +22,7 @@ var audio_recibido = new Audio('./media/$whatsapp_incoming.wav');
 var audio_enviado = new Audio('./media/wa_ptt_sent.wav');
 var audio_inicio = new Audio('./media/inicio.mp3');
 var audio_unirse = new Audio('./media/unirse.mp3');
+var audio_fondo = new Audio('./media/fondo.mp3');
 
 // setInterval vaciar los eventos después de tres segundos
 setInterval(() => {
@@ -93,6 +94,9 @@ form_login.addEventListener('submit', function (e) {
 	// Emitir el evento 'add-user' al servidor solo si el nombre de usuario es válido
 	socket.emit('add-user', username);
 	location.reload();
+	// el sonido fondo
+	audio_fondo.play();
+	audio_fondo.loop = true;
 });
 
 // Evento para cerrar sesión
