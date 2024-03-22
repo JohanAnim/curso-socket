@@ -16,10 +16,17 @@ var form_login = document.getElementById('form_login');
 var form_logout = document.getElementById('form_logout');
 var nickname_span = document.getElementById('nickname_span');
 var select_voz = document.getElementById('select_voz');
-// Audio para cuando manden un mensaje
+var eventos = document.getElementById('eventos');
+// Audios
 var audio_recibido = new Audio('./media/$whatsapp_incoming.wav');
-// Audio para cuando se reciba un mensaje
 var audio_enviado = new Audio('./media/wa_ptt_sent.wav');
+var audio_inicio = new Audio('./media/inicio.mp3');
+var audio_unirse = new Audio('./media/unirse.mp3');
+
+// setInterval vaciar los eventos después de tres segundos
+setInterval(() => {
+	eventos.innerHTML = '';
+}, 3000);
 
 // Después de que se cargue la página, meter todas las voces disponibles en el select
 window.speechSynthesis.onvoiceschanged = function () {
@@ -64,6 +71,7 @@ window.onload = function () {
 		login.style.display = 'block';
 		logout.style.display = 'none';
 		form.style.display = 'none';
+		audio_inicio.play();
 	}
 };
 
@@ -75,8 +83,15 @@ select_voz.addEventListener('change', function () {
 // Evento para iniciar sesión
 form_login.addEventListener('submit', function (e) {
 	e.preventDefault();
-	localStorage.setItem('nickname', nickname.value);
+	var username = nickname.value.trim(); // Obtener el nombre de usuario y limpiar espacios en blanco
+	if (username === '') {
+		Tts('Debes ingresar un nombre de usuario');
+		return;
+	}
+	localStorage.setItem('nickname', username);
 	localStorage.setItem('voz', select_voz.value);
+	// Emitir el evento 'add-user' al servidor solo si el nombre de usuario es válido
+	socket.emit('add-user', username);
 	location.reload();
 });
 
@@ -100,7 +115,18 @@ socket.on('message-received', function (data) {
 	// Leer el mensaje recibido
 	Tts("Nuevo mensaje de " + data.nickname + " dice: " + data.text);
 	navigator.vibrate([300, 100, 300]);
+	// enfocar al elemento de el localStorage
+	let currentIndex = localStorage.getItem('currentIndex');
+	if (currentIndex) {
+		document.querySelectorAll('.mensaje')[currentIndex].tabIndex = 0;
+		document.querySelectorAll('.mensaje')[currentIndex].ariaSelected = 'true';
+	}
 });
+// el evento user-joined
+socket.on('user-joined', function (username) {
+	audio_unirse.play();
+	eventos.innerHTML = username + ' se ha unido al chat';
+}	);
 
 function render(data) {
 	var html = data.map(function (elem, index) {
@@ -117,7 +143,6 @@ function render(data) {
 		let currentIndex = localStorage.getItem('currentIndex');
 		// si el indice existe, enfocar el mensaje correspondiente
 		if (currentIndex) {
-			document.querySelectorAll('.mensaje')[currentIndex].focus();
 			document.querySelectorAll('.mensaje')[currentIndex].tabIndex = 0;
 			document.querySelectorAll('.mensaje')[currentIndex].ariaSelected = 'true';
 		} else {
@@ -129,7 +154,7 @@ function render(data) {
 }
 
 // evento para guardar el indice de la posición del mensaje enfocado en el localStorage
-document.addEventListener('focus', function (event) {
+messages.addEventListener('focus', function (event) {
 	let currentMessage = event.target;
 	let allMessages = document.querySelectorAll('.mensaje');
 	let currentIndex = Array.from(allMessages).indexOf(currentMessage);
@@ -161,6 +186,24 @@ function handleKeyDown(event) {
 				allMessages[currentIndex + 1].tabIndex = 0;
 				allMessages[currentIndex + 1].focus();
 			}
+			break;
+			// la tecla de inicio
+		case 'Home':
+			event.preventDefault();
+			allMessages[currentIndex].ariaSelected = 'false';
+			allMessages[currentIndex].tabIndex = -1;
+			allMessages[0].ariaSelected = 'true';
+			allMessages[0].tabIndex = 0;
+			allMessages[0].focus();
+			break;
+			// la tecla de fin
+		case 'End':
+			event.preventDefault();
+			allMessages[currentIndex].ariaSelected = 'false';
+			allMessages[currentIndex].tabIndex = -1;
+			allMessages[allMessages.length - 1].ariaSelected = 'true';
+			allMessages[allMessages.length - 1].tabIndex = 0;
+			allMessages[allMessages.length - 1].focus();
 			break;
 		default:
 			break;
