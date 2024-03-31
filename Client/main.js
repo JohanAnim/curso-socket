@@ -22,7 +22,6 @@ var audio_recibido = new Audio('./media/$whatsapp_incoming.wav');
 var audio_enviado = new Audio('./media/wa_ptt_sent.wav');
 var audio_inicio = new Audio('./media/inicio.mp3');
 var audio_unirse = new Audio('./media/unirse.mp3');
-var audio_fondo = new Audio('./media/fondo.mp3');
 
 // setInterval vaciar los eventos después de tres segundos
 setInterval(() => {
@@ -68,10 +67,6 @@ window.onload = function () {
 		form.style.display = 'block';
 		nickname.value = localStorage.getItem('nickname');
 		nickname_span.innerHTML = localStorage.getItem('nickname');
-		setTimeout(() => {
-			audio_fondo.play();
-			audio_fondo.loop = true;
-		}, 500);
 	} else {
 		login.style.display = 'block';
 		logout.style.display = 'none';
