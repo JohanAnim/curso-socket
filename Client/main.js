@@ -1,6 +1,20 @@
 
-var SOCKET_SERVER_URL = 'http://192.168.10.7:80';
-if (window.location.hostname !== '192.168.10.7') {
+/**
+ * This script file represents the client-side functionality of a chat application.
+ * It establishes a connection with the server using Socket.IO and handles various events and user interactions.
+ * The script includes functions for sending and receiving messages, managing user login/logout, and handling speech synthesis.
+ * It also includes event listeners for user interactions such as submitting forms and navigating through messages.
+ *
+ * @fileoverview Client-side functionality for the chat application.
+ * @module main
+ * @requires socket.io
+ */
+/**
+ * The URL of the socket server.
+ * @type {string}
+ */
+var SOCKET_SERVER_URL = 'http://localhost:80';
+if (location.hostname !== 'localhost') {
 	SOCKET_SERVER_URL = 'https://chat-accesible-c3f6ce045512.herokuapp.com/';
 }
 var socket = io.connect(SOCKET_SERVER_URL, { 'forceNew': true });
